@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Archivos temporales
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Datos generados (estos se crean en runtime, no necesitan estar en la imagen)
+data/clean/*
+data/heatmaps/*
+data/results/*
+!data/raw/
+!data/raw/*.png
+!data/raw/*.jpg
+
+# Archivos de debug
+*.md
+!DEBUG_GUIDE.md
+
+# Tests locales (los scripts de test no son necesarios en producción)
+test_pipeline.py
+compare_preprocessing.py
+CAMBIOS_REALIZADOS.md
+
+# Archivos de Docker
+.dockerignore
+Dockerfile

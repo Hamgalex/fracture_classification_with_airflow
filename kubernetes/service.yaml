@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fracture-airflow-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: fracture-airflow
+  ports:
+    - port: 80
+      targetPort: 8080
