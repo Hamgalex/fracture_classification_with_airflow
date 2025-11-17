@@ -1,3 +1,6 @@
 *.pth
 *.png
 *.json
+/pipeline/__pycache__
+/config/__pycache__
+*.jpg

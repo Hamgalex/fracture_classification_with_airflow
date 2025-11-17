@@ -2,6 +2,7 @@ FROM python:3.11
 
 ENV AIRFLOW_HOME=/opt/airflow
 ENV AIRFLOW__CORE__LOAD_EXAMPLES=False
+ENV AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth
 
 WORKDIR $AIRFLOW_HOME
 

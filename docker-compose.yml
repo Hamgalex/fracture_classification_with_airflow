@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # AIRFLOW - Pipeline de procesamiento
+  # ==========================================
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fracture-airflow
+    ports:
+      - "8080:8080"
+    volumes:
+      # Montar carpeta data para compartir archivos
+      - ./data:/opt/airflow/data
+    environment:
+      - AIRFLOW_HOME=/opt/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - fracture-network
+
+  # ==========================================
+  # STREAMLIT - Interfaz web
+  # ==========================================
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: fracture-streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      # Montar carpeta data para leer/escribir archivos
+      - ./data:/app/data
+    depends_on:
+      - airflow
+    environment:
+      - AIRFLOW_URL=http://airflow:8080/api/v1
+    networks:
+      - fracture-network
+
+networks:
+  fracture-network:
+    driver: bridge
