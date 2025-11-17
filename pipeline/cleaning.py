@@ -1,5 +1,6 @@
 import os
-import shutil
+import cv2
+import numpy as np
 from config.config import CLEAN_DIR
 
 class ImageCleaner:
@@ -10,19 +11,43 @@ class ImageCleaner:
         clean_path = os.path.join(CLEAN_DIR, filename)
 
         print("\n" + "="*60)
-        print("LIMPIEZA DE IMAGEN - SIN PREPROCESSING")
+        print("LIMPIEZA DE IMAGEN")
         print("="*60)
         print(f"Imagen raw: {raw_path}")
-        print(f"El modelo fue entrenado SIN preprocessing")
-        print(f"Solo se aplicara: Resize + ToTensor + Normalize (en evaluation.py)")
 
         if not os.path.exists(raw_path):
             raise FileNotFoundError(f"No existe la imagen: {raw_path}")
 
-        shutil.copy(raw_path, clean_path)
+        # Leer imagen
+        img = cv2.imread(raw_path)
+        if img is None:
+            raise ValueError(f"No se pudo leer la imagen: {raw_path}")
 
-        print(f"\nImagen copiada sin modificaciones")
-        print(f"Guardada en: {clean_path}")
+        print(f"Dimensiones originales: {img.shape}")
+
+        # Normalización de brillo
+        # Ajustar brillo si la imagen está muy oscura o clara
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        mean_brightness = np.mean(gray)
+
+        if mean_brightness < 100:  # Imagen muy oscura
+            alpha = 1.2  # Aumentar contraste
+            beta = 20    # Aumentar brillo
+            img_normalized = cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
+            print(f"✓ Aplicado: Normalización de brillo (original={mean_brightness:.1f})")
+        elif mean_brightness > 180:  # Imagen muy clara
+            alpha = 0.9  # Reducir contraste
+            beta = -10   # Reducir brillo
+            img_normalized = cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
+            print(f"✓ Aplicado: Normalización de brillo (original={mean_brightness:.1f})")
+        else:
+            img_normalized = img
+            print(f"✓ Brillo adecuado (mean={mean_brightness:.1f}), sin ajuste")
+
+        # Guardar imagen limpia
+        cv2.imwrite(clean_path, img_normalized)
+
+        print(f"\nImagen limpia guardada en: {clean_path}")
         print("="*60 + "\n")
 
         return clean_path
