@@ -9,7 +9,7 @@ from datetime import datetime
 # Configuración
 AIRFLOW_URL = "http://localhost:8080/api/v1"  # Airflow en Docker, Streamlit local
 AIRFLOW_USER = "admin"
-AIRFLOW_PASSWORD = "tPCv9XUEPkGFM7uG"  # Cambiar después de obtenerla de los logs
+AIRFLOW_PASSWORD = "ehTEXqUakp43YT99"  # Cambiar después de obtenerla de los logs
 DAG_ID = "fracture_detection_pipeline"
 DATA_RAW_DIR = "data/raw"
 DATA_RESULTS_DIR = "data/results"

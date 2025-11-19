@@ -51,3 +51,32 @@ class ImageCleaner:
         print("="*60 + "\n")
 
         return clean_path
+
+    @staticmethod
+    def task(**kwargs):
+        """Tarea de Airflow para limpieza de imágenes"""
+        print("\n" + "="*80)
+        print("TAREA 2: LIMPIEZA")
+        print("="*80)
+
+        ti = kwargs["ti"]
+
+        filename = ti.xcom_pull(task_ids="ingest", key="filename")
+        raw_path = ti.xcom_pull(task_ids="ingest", key="raw_path")
+
+        print(f"Procesando: {filename}")
+        print(f"Ruta raw: {raw_path}")
+
+        try:
+            cleaner = ImageCleaner(save_debug_images=True)
+            clean_path = cleaner.clean(raw_path, filename)
+
+            ti.xcom_push(key="clean_path", value=clean_path)
+
+            print(f"Limpieza exitosa: {clean_path}")
+            print("="*80 + "\n")
+
+        except Exception as e:
+            print(f"Error en limpieza: {str(e)}")
+            print("="*80 + "\n")
+            raise

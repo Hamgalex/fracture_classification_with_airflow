@@ -96,3 +96,33 @@ class GradCAMGenerator:
         print(f"CAM stats: min={cam.min():.4f}, max={cam.max():.4f}, mean={cam.mean():.4f}")
 
         return heatmap_path
+
+    @staticmethod
+    def task(**kwargs):
+        """Tarea de Airflow para generación de Grad-CAM"""
+        print("\n" + "="*80)
+        print("TAREA 5: GRAD-CAM")
+        print("="*80)
+
+        ti = kwargs["ti"]
+
+        clean_path = ti.xcom_pull(task_ids="clean", key="clean_path")
+        label = ti.xcom_pull(task_ids="evaluate", key="label")
+
+        print(f"Generando Grad-CAM para: {clean_path}")
+        print(f"Diagnostico: {label}")
+
+        try:
+            MODEL_PATH_GRADCAM = "/opt/airflow/model/modelo_fractura_resnet50.pth"
+            explainer = GradCAMGenerator(MODEL_PATH_GRADCAM)
+            heatmap_path = explainer.generate(clean_path)
+
+            ti.xcom_push(key="heatmap_path", value=heatmap_path)
+
+            print(f"Grad-CAM generado exitosamente")
+            print("="*80 + "\n")
+
+        except Exception as e:
+            print(f"Error en Grad-CAM: {str(e)}")
+            print("="*80 + "\n")
+            raise

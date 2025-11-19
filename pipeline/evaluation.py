@@ -58,3 +58,34 @@ class ModelEvaluator:
         print(f"{'='*60}\n")
 
         return label, score, tensor
+
+    @staticmethod
+    def task(**kwargs):
+        """Tarea de Airflow para evaluación del modelo"""
+        print("\n" + "="*80)
+        print("TAREA 3: EVALUACION DEL MODELO")
+        print("="*80)
+
+        ti = kwargs["ti"]
+
+        clean_path = ti.xcom_pull(task_ids="clean", key="clean_path")
+        print(f"Evaluando imagen: {clean_path}")
+
+        MODEL_PATH = "/opt/airflow/model/modelo_fractura_resnet50.pth"
+        print(f"Modelo: {MODEL_PATH}")
+
+        try:
+            evaluator = ModelEvaluator(MODEL_PATH)
+            label, score, tensor = evaluator.evaluate(clean_path)
+
+            ti.xcom_push(key="label", value=label)
+            ti.xcom_push(key="score", value=score)
+            ti.xcom_push(key="tensor", value=tensor.cpu().numpy().tolist())
+
+            print(f"Evaluacion completada")
+            print("="*80 + "\n")
+
+        except Exception as e:
+            print(f"Error en evaluacion: {str(e)}")
+            print("="*80 + "\n")
+            raise
